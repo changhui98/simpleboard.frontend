@@ -1,10 +1,22 @@
 import './App.css';
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import Home from "./Home.js"
+import CreatePost from "./CreatePost.js"
+import PostDetail from "./PostDetail.js"
+import PostEdit from "./PostEdit.js"
 
 function App() {
   return (
-    <div className="App">
-
-    </div>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path={"/"} element={<Home />}></Route>
+            <Route path={"/create"} element={<CreatePost />}></Route>
+            <Route path={"/post/:id"} element={<PostDetail />}></Route>
+            <Route path={"/post/edit/:id"} element={<PostEdit />}></Route>
+          </Routes>
+        </div>
+      </Router>
   );
 }
 
