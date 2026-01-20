@@ -1,45 +1,90 @@
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./css/edit.css";
+import axios from "axios";
 
 let PostEdit = () => {
-
-  const {id} = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  let [title, setTitle] = useState("");
-  let [content, setContent] = useState("");
+  let [post, setPost] = useState({
+    title: "",
+    content: "",
+  });
 
   useEffect(() => {
-    setTitle(`${id} 번째 게시글 제목`);
-    setContent(`${id} 번째 게시글 상세 내용입니다.`)
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/posts/${id}`)
+      .then((res) => {
+        console.log(res.data);
+        setPost(res.data);
+      })
+      .catch((err) => {
+        console.err(err);
+        alert("게시글 불러오는데 실패하였습니다.");
+      });
   }, [id]);
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setPost({
+      ...post,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("게시글이 수정되었습니다.");
-    navigate(`/post/${id}`);
-  }
+
+    axios
+      .put(`${process.env.REACT_APP_API_URL}/posts/${id}`, post)
+      .then((res) => {
+        console.log(res.data);
+        alert("게시글이 수정되었습니다.");
+        navigate(`/post/${id}`);
+      })
+      .catch((err) => {
+        console.err(err);
+        alert("게시글 수정에 실패하였습니다.");
+      });
+  };
 
   return (
-      <div className={"post-edit-container"}>
-        <h1 className={"post-edit-title"}>게시글 수정</h1>
-        <form onSubmit={handleSubmit} className={"post-edit-form"}>
-          <div className={"form-group"}>
-            <label htmlFor={"title"}>제목</label>
-            <input id={"title"} type={"text"} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={"제목을 입력하세요."}/>
-          </div>
-          <div className={"form-group"}>
-            <label htmlFor={"content"}>내용</label>
-            <textarea id={"content"} value={content} onChange={(e) => setContent(e.target.value)} placeholder={"내용을 입력하세요."}></textarea>
-          </div>
-          <div className={"button-group"}>
-            <button type={"submit"} className={"submit-button"}>수정 완료</button>
-            <Link to={`/post/${id}`} className={"cancel-button"}>취소</Link>
-          </div>
-        </form>
-      </div>
+    <div className={"post-edit-container"}>
+      <h1 className={"post-edit-title"}>게시글 수정</h1>
+      <form onSubmit={handleSubmit} className={"post-edit-form"}>
+        <div className={"form-group"}>
+          <label htmlFor={"title"}>제목</label>
+          <input
+            name={"title"}
+            id={"title"}
+            type={"text"}
+            value={post.title}
+            onChange={handleOnChange}
+            placeholder={"제목을 입력하세요."}
+          />
+        </div>
+        <div className={"form-group"}>
+          <label htmlFor={"content"}>내용</label>
+          <textarea
+            name={"content"}
+            id={"content"}
+            value={post.content}
+            onChange={handleOnChange}
+            placeholder={"내용을 입력하세요."}
+          ></textarea>
+        </div>
+        <div className={"button-group"}>
+          <button type={"submit"} className={"submit-button"}>
+            수정 완료
+          </button>
+          <Link to={`/post/${id}`} className={"cancel-button"}>
+            취소
+          </Link>
+        </div>
+      </form>
+    </div>
   );
-}
+};
 
 export default PostEdit;
