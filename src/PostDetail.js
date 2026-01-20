@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./css/detail.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 let PostDetail = () => {
   const { id } = useParams();
+  let navigate = useNavigate();
 
   let [post, setPost] = useState({
     title: "",
@@ -28,7 +29,21 @@ let PostDetail = () => {
   }, []);
 
   const handleDelete = () => {
-    alert("게시글이 삭제되었습니다.");
+    if (!window.confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+
+    axios
+      .delete(`${process.env.REACT_APP_API_URL}/posts/${id}`)
+      .then((res) => {
+        console.log(res.data);
+        alert("삭제가 완료되었습니다.");
+        navigate("/");
+      })
+      .catch((err) => {
+        console.err(err);
+        alert("삭제 중 오류가 발생했습니다.");
+      });
   };
 
   return (
